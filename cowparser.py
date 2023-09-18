@@ -1,3 +1,5 @@
+import time
+
 def move_cursor(n):
   global cursor, output
   cursor += n
@@ -53,15 +55,15 @@ def execute_block(block):
     return True
 
 def MOO():
-  global data, cursor, i, words, output
+  global data, cursor, i, instructions, output
   if data[cursor] == 0:
     tmp = i+1
     MOO_cpt = 0
     moo_pos = -1
-    while tmp < len(words):
-      if words[tmp] == "MOO":
+    while tmp < len(instructions):
+      if instructions[tmp] == "MOO":
         MOO_cpt += 1
-      elif words[tmp] == "moo":
+      elif instructions[tmp] == "moo":
         if MOO_cpt == 0:
           moo_pos = tmp
           break
@@ -76,15 +78,15 @@ def MOO():
       return True
   
 def moo():
-  global data, cursor, i, words, output
+  global data, cursor, i, instructions, output
   if data[cursor] != 0:
     tmp = i-1
     moo_cpt = 0
     MOO_pos = -1
     while tmp >= 0:
-      if words[tmp] == "moo":
+      if instructions[tmp] == "moo":
         moo_cpt += 1
-      elif words[tmp] == "MOO":
+      elif instructions[tmp] == "MOO":
         if moo_cpt == 0:
           MOO_pos = tmp
           break
@@ -114,7 +116,12 @@ exec_map = {"moo": "moo()", "mOo": "move_cursor(-1)", "moO": "move_cursor(1)", "
 
 
 def main(words):
-  global data, cursor, register, i, output
+  global data, cursor, register, i, output, instructions
+  
+  instructions = words
+  
+  start = time.time()
+  
   data = [0] * 30000
   cursor = 0
   register = None
@@ -170,6 +177,10 @@ def main(words):
         result = moo()
         if result == False:
           return output
+    
+    # stops the program if it takes more than 20 seconds
+    if time.time() - start > 20:
+      return "program took more than 20 seconds to end \n" + output
     
     i += 1
   return output

@@ -28,7 +28,8 @@ async def interpret(ctx):
     # react with a thumb up
     await ctx.message.add_reaction('👍')
     file = ctx.message.attachments[0]
-    attachment = await file.read().decode('utf-8')
+    attachment = await file.read()
+    attachment = attachment.decode('utf-8')
     content = cowparser.init(attachment)
     output = cowparser.main(content)
   else:
