@@ -2,7 +2,7 @@ from os import getenv
 from dotenv import load_dotenv
 from discord.ext import commands
 import discord
-#import cowparser
+import cowparser
 
 load_dotenv()
 
@@ -21,5 +21,25 @@ async def help(ctx):
   # react with a thumb up
   await ctx.message.add_reaction('👍')
   await ctx.send("help")
+
+@bot.command(name='interpret')
+async def interpret(ctx):
+  if ctx.message.attachments:
+    # react with a thumb up
+    await ctx.message.add_reaction('👍')
+    file = ctx.message.attachments[0]
+    attachment = await file.read().decode('utf-8')
+    content = cowparser.init(attachment)
+    output = cowparser.main(content)
+  else:
+    # read message
+    message = ctx.message.content
+    await ctx.message.add_reaction('👍')
+    content = cowparser.init(message)
+    output = cowparser.main(content)
+  if output == "":
+    await ctx.send("No output")
+  else:
+    await ctx.send(output)
 
 bot.run(getenv('DISCORD_TOKEN'))

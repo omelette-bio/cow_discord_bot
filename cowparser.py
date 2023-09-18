@@ -1,13 +1,10 @@
-#!/usr/bin/env python3
-
-import os, argparse, sys, time
-
 def move_cursor(n):
-  global cursor
+  global cursor, output
   cursor += n
   if cursor < 0 or cursor > 29999:
-    print("Error: cursor out of bounds")
-    sys.exit(1)
+    output = "Error: cursor out of bounds"
+    return False
+  return True
 
 def set_block(n):
   global cursor, data
@@ -22,11 +19,11 @@ def register_operation():
     register = None
 
 def display_block(target_type):
-  global data, cursor
+  global data, cursor, output
   if target_type == "ascii":
-    print(chr(data[cursor]), end = '')
+    output += chr(data[cursor])
   elif target_type == "int":
-    print(data[cursor])
+    output += str(data[cursor])+'\n'
 
 def input_block():
   global data, cursor
@@ -41,21 +38,22 @@ def Moo():
     display_block("ascii")
 
 def execute_block(block):
-  global exec_map, COW_KEYWORDS
+  global exec_map, COW_KEYWORDS, output
   try:
     func = COW_KEYWORDS[block]
   except:
-    print("Error: invalid block")
-    sys.exit(1)
+    output = "Error: invalid block"
+    return False
   func = exec_map[func]
   if func == None:
-    print("Error: 3 is an invalid data : it would cause an infinite loop")
-    sys.exit(1)
+    output = "Error: 3 is an invalid block, would cause infinite loop"
+    return False
   else:
     exec(func)
+    return True
 
 def MOO():
-  global data, cursor, i, words
+  global data, cursor, i, words, output
   if data[cursor] == 0:
     tmp = i+1
     MOO_cpt = 0
@@ -71,13 +69,14 @@ def MOO():
           MOO_cpt -= 1
       tmp += 1
     if moo_pos == -1:
-      print("Error: no matching moo")
-      sys.exit(1)
+      output = "Error: no matching moo"
+      return False
     else:
       i = moo_pos
+      return True
   
 def moo():
-  global data, cursor, i, words
+  global data, cursor, i, words, output
   if data[cursor] != 0:
     tmp = i-1
     moo_cpt = 0
@@ -93,85 +92,84 @@ def moo():
           moo_cpt -= 1
       tmp -= 1
     if MOO_pos == -1:
-      print("Error: no matching MOO")
-      sys.exit(1)
+      output = "Error: no matching MOO"
+      return False
     else:
       i = MOO_pos
+      return True
 
-parser = argparse.ArgumentParser(description='Cow Interpreter')
-parser.add_argument('file', help = 'cow file to interpret')
+def init(input):
+  global code, COW_KEYWORDS
+  code = input.split()
+  words = []
+  for line in code:
+    for word in line.split():
+      if word in COW_KEYWORDS:
+        words.append(word)
+  return words
 
-args = parser.parse_args()
-
-if not os.path.isfile(args.file):
-  print("Error: file does not exist")
-  sys.exit(1)
-
-if args.file[-4:] != ".cow":
-  print("Error: file is not a cow file")
-  sys.exit(1)
-
-f = os.open(args.file, os.O_RDONLY)
-code = os.read(f, os.path.getsize(args.file))
 
 COW_KEYWORDS=("moo", "mOo", "moO", "mOO", "Moo", "MOo", "MoO", "MOO", "OOO", "MMM", "OOM", "oom")
 exec_map = {"moo": "moo()", "mOo": "move_cursor(-1)", "moO": "move_cursor(1)", "mOO": None, "Moo": "Moo()", "MOo": "set_block(data[cursor] - 1)", "MoO": "set_block(data[cursor] + 1)", "MOO": "MOO()", "OOO": "set_block(0)", "MMM": "register_operation()", "OOM": "display_block('int')", "oom": "input_block()"}
 
-# transform code into a list
-code = code.decode('utf-8').split('\n')
 
-# get a list of all words and exclude words that are not cow keywords
-words = []
-for line in code:
-  for word in line.split():
-    if word in COW_KEYWORDS:
-      words.append(word)
+def main(words):
+  global data, cursor, register, i, output
+  data = [0] * 30000
+  cursor = 0
+  register = None
+  i = 0
+  end = len(words)
+  output = ""
 
-data = [0] * 30000
-cursor = 0
-register = None
-i = 0
-end = len(words)
-  
-
-while i < end:
-  #print(f"{words[i]}: {data[:3]}: {cursor}: {i}")
-  match words[i]:
-    case "mOo":
-      move_cursor(-1)
+  while i < end:
+    #print(f"{words[i]}: {data[:3]}: {cursor}: {i}")
+    match words[i]:
+      case "mOo":
+        result = move_cursor(-1)
+        if result == False:
+          return output
+      
+      case "moO":
+        result = move_cursor(1)
+        if result == False:
+          return output
+      
+      case "MOo":
+        set_block(data[cursor] - 1)
+      
+      case "MoO":
+        set_block(data[cursor] + 1)
+      
+      case "OOO":
+        set_block(0)
+      
+      case "MMM":
+        register_operation()
+      
+      case "OOM":
+        display_block("int")
+      
+      case "Moo":
+        Moo()
+      
+      case "oom":
+        input_block()
+      
+      case "mOO":
+        result = execute_block(data[cursor])
+        if result == False:
+          return output
+        
+      case "MOO":
+        result = MOO()
+        if result == False:
+          return output
+      
+      case "moo":
+        result = moo()
+        if result == False:
+          return output
     
-    case "moO":
-      move_cursor(1)
-    
-    case "MOo":
-      set_block(data[cursor] - 1)
-    
-    case "MoO":
-      set_block(data[cursor] + 1)
-    
-    case "OOO":
-      set_block(0)
-    
-    case "MMM":
-      register_operation()
-    
-    case "OOM":
-      display_block("int")
-    
-    case "Moo":
-      Moo()
-    
-    case "oom":
-      input_block()
-    
-    case "mOO":
-      execute_block(data[cursor])
-    
-    case "MOO":
-      MOO()
-    
-    case "moo":
-      moo()
-  
-  
-  i += 1
+    i += 1
+  return output
