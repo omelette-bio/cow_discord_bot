@@ -24,9 +24,9 @@ async def help(ctx):
 
 @bot.command(name='interpret')
 async def interpret(ctx):
+  await ctx.message.add_reaction('👍')
   if ctx.message.attachments:
     # react with a thumb up
-    await ctx.message.add_reaction('👍')
     file = ctx.message.attachments[0]
     attachment = await file.read()
     attachment = attachment.decode('utf-8')
@@ -35,9 +35,9 @@ async def interpret(ctx):
   else:
     # read message
     message = ctx.message.content
-    await ctx.message.add_reaction('👍')
     content = cowparser.init(message)
     output = cowparser.main(content)
+
   if output == "":
     await ctx.send("No output")
   else:
