@@ -1,0 +1,83 @@
+created by sean heber in 2003
+brainfuck variant
+designed for bovines
+
+12 instructions
+turing complete
+works with variations of the word moo
+
+0 : moo
+
+1 : mOo : move current memory position back by one block
+
+2 : moO : move current memory position forward by one block
+
+3 : mOO : execute value in current memory block as if it were an instruction based on the instruction code value, 3 is invalid because 
+          it would create a loop
+
+4 : Moo : if current memory block has a 0 in it, read a single ASCII character from stdin and store it in the current memory block.
+          else it will print the data in the block as an ASCII character
+
+5 : MOo : decrement current memory block value by one
+
+6 : MoO : increment current memory block value by one
+
+7 : MOO : if current memory block value is 0, goes to the matching "moo" value and continue, else it will continue with next command
+
+8 : OOO : set current memory block value to 0
+
+9 : MMM : the register is a seperate block from the memory that can stock value, if nothing is in it, calling the command will copy
+          the value of the current memory block to the register, else it will copy the value of the register to the current memory block
+
+10 : OOM : print current memory block value as an int
+
+11 : oom : read an integer from stdin and store it in the current memory block
+
+all other characters are considered comments
+
+esoteric language : program made to test the limits of programming language design
+
+
+how helloworld works:
+increments 72 times the current memory block to get the 'H', prints it, increments 29 times to get the 'e', prints it, increments 7 times to get
+the 'l', prints it twice, then increments 3 to get the 'o' then prints it.
+
+how fibonnacci works:
+
+first block serves to get the previous number
+second to get the actual and third to get a counter
+
+the first line creates the first two '1'
+in the main loop:
+  we print the first memory block
+  copy it to third block (third block serves as a counter)
+  copy the second block to the first
+  
+  in the inner loop:
+    we decrease the counter
+    we increase the second block
+    breaks when counter = 0
+  
+  go back to the beginning
+
+
+plan:
+  - intro talking about programming languages
+    - talking about most used languages
+    - talking about types of languages
+  - continue more precisely by going to esoteric languages
+  - go to the real subject
+    - introduce the language
+    - explain how it works
+    - explain the instructions
+    - explain quickly hello world
+    - explain fibonacci
+    - explain how did i make the interpreter
+
+explain the ascii table
+
+sources :
+https://youtu.be/px2aSX02pqE?si=NVdU_Fq88yuC_pKL
+https://esolangs.org/wiki/COW
+https://bigzaphod.github.io/COW/
+https://github.com/BigZaphod/COW.git
