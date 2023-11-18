@@ -1,0 +1,3 @@
+[submodule "cowlangc"]
+	path = cowlangc
+	url = https://github.com/omelette-bio/cowlangc.git
